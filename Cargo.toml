@@ -1,13 +1,23 @@
 [package]
 name = "choreographer"
 version = "0.1.0"
+description = "A color pattern sequencer, intended for groups of RGB LEDs"
+repository = "https://github.com/jamesmunns/choreographer"
 authors = ["James Munns <james.munns@ferrous-systems.com>"]
 edition = "2018"
+readme = "README.md"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+categories = [
+    "embedded",
+    "no-std",
+]
+license = "MPL-2.0"
 
 [dependencies]
 groundhog = "0.1.0"
 heapless = "0.7.1"
 smart-leds = "0.3.0"
 micromath = "2.0.0"
+
+[package.metadata.docs.rs]
+all-features = true
