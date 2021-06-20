@@ -1,13 +1,28 @@
+//! Behaviors
+//!
+//! Behaviors are the smallest unit of action that
+//! can be choreographed. They describe a pattern
+//! that is polled for some amount of time before
+//! moving to the next step.
+
 use crate::engine::Context;
 use crate::LossyIntoF32;
 use groundhog::RollingTimer;
 use micromath::F32Ext;
 use smart_leds::RGB8;
 
+/// StayColor - A solid constant color
+///
+/// This is the simplest behavior
 #[derive(Clone, Debug, Default)]
 pub struct StayColor;
 
 impl StayColor {
+    /// Create a new StayColor instance
+    ///
+    /// This instance contains no information, as color, duration,
+    /// and other information are stored in the
+    /// [`Context`](crate::engine::Context) structure
     pub fn new() -> Self {
         StayColor
     }
@@ -42,11 +57,6 @@ impl Default for AutoIncr {
 pub struct Cycler {
     func: fn(f32) -> f32,
 }
-
-// Methods:
-//
-// reinit(): reinitialize with the current time
-// poll() -> Option<RGB8>: Some if updated color, None if action is complete
 
 impl Cycler {
     pub fn new() -> Self {

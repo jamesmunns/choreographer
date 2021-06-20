@@ -1,14 +1,31 @@
+//! # Choreographer
+//!
+//! A color pattern sequencer, intended for groups of RGB LEDs
+//!
+//! ## Example
+//!
+//! Check out the video [in this tweet](https://twitter.com/bitshiftmask/status/1404633529179377673)
+//!
+//! ## License
+//!
+//! This project is licensed under the [Mozilla Public License v2.0](https://www.mozilla.org/en-US/MPL/2.0/).
+
+
 #![cfg_attr(not(test), no_std)]
+// #![deny(missing_docs)]
 
 pub mod behaviors;
 pub mod engine;
+pub use smart_leds::colors;
 
+/// A trait to convert integers into `f32`s
+///
+/// This conversion may be lossy, but we're not *too* worried
+/// about precision here.
 pub trait LossyIntoF32 {
+    /// Convert a number into a float, possibly losing precision
+    /// or accumulating error
     fn lossy_into(&self) -> f32;
-}
-
-pub mod reexports {
-    pub use smart_leds::colors;
 }
 
 impl LossyIntoF32 for u64 {
