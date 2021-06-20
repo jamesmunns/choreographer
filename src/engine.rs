@@ -1,18 +1,17 @@
 use core::cmp::min;
-use core::ops::{Deref, DerefMut};
 use core::marker::PhantomData;
+use core::ops::{Deref, DerefMut};
 
 use crate::behaviors::AutoIncr;
-use crate::behaviors::{Cycler, FadeColor, StayColor, SeekColor};
+use crate::behaviors::{Cycler, FadeColor, SeekColor, StayColor};
 use crate::LossyIntoF32;
 use groundhog::RollingTimer;
 use heapless::Vec;
-use smart_leds::RGB8;
 use smart_leds::colors::BLACK;
+use smart_leds::RGB8;
 
 #[derive(Clone)]
-pub struct Sequence<R, const N: usize>
-{
+pub struct Sequence<R, const N: usize> {
     seq: Vec<Action<R>, N>,
     position: usize,
     behavior: Behavior,
@@ -46,15 +45,13 @@ where
 }
 
 #[derive(Clone)]
-pub struct Action<R>
-{
+pub struct Action<R> {
     action: Actions<R>,
     behavior: Behavior,
 }
 
 #[derive(Clone, Default)]
-pub struct Context<R>
-{
+pub struct Context<R> {
     pub(crate) start_tick: u32, // TODO: Hack - Not R::Tick because const init
     pub(crate) auto_incr_phase: AutoIncr,
     pub(crate) period_ms: f32,
@@ -95,8 +92,7 @@ where
 }
 
 #[derive(Clone)]
-pub struct Actions<R>
-{
+pub struct Actions<R> {
     context: Context<R>,
     kind: ActionsKind,
 }
@@ -409,18 +405,10 @@ where
 
         // TODO: fix hax?
         self.act.action.context.period_ms = match self.act.action.kind {
-            ActionsKind::Sin(_) => {
-                period_ms * 2.0
-            }
-            ActionsKind::Static(_) => {
-                period_ms
-            }
-            ActionsKind::Fade(_) => {
-                duration.lossy_into() * 4.0
-            }
-            ActionsKind::Seek(_) => {
-                period_ms
-            }
+            ActionsKind::Sin(_) => period_ms * 2.0,
+            ActionsKind::Static(_) => period_ms,
+            ActionsKind::Fade(_) => duration.lossy_into() * 4.0,
+            ActionsKind::Seek(_) => period_ms,
         };
 
         self

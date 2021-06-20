@@ -60,7 +60,9 @@ pub struct Cycler {
 
 impl Cycler {
     pub fn new() -> Self {
-        Self { func: <f32 as F32Ext>::sin }
+        Self {
+            func: <f32 as F32Ext>::sin,
+        }
     }
 
     pub fn poll<R>(&self, context: &Context<R>) -> Option<RGB8>
@@ -102,7 +104,6 @@ impl Cycler {
     }
 }
 
-
 #[derive(Clone)]
 pub struct SeekColor;
 
@@ -135,8 +136,11 @@ impl SeekColor {
         let norm_g = ((context.last_color.g as i16) + ((delta_g * norm_dt) as i16)) as u8;
         let norm_b = ((context.last_color.b as i16) + ((delta_b * norm_dt) as i16)) as u8;
 
-
-        Some(RGB8 { r: norm_r, g: norm_g, b: norm_b })
+        Some(RGB8 {
+            r: norm_r,
+            g: norm_g,
+            b: norm_b,
+        })
     }
 }
 

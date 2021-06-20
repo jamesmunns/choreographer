@@ -1,6 +1,6 @@
 [package]
 name = "choreographer"
-version = "0.0.1"
+version = "0.0.2"
 description = "A color pattern sequencer, intended for groups of RGB LEDs"
 repository = "https://github.com/jamesmunns/choreographer"
 authors = ["James Munns <james.munns@ferrous-systems.com>"]
@@ -14,10 +14,14 @@ categories = [
 license = "MPL-2.0"
 
 [dependencies]
-groundhog = "0.1.0"
+groundhog = "0.2.3"
 heapless = "0.7.1"
 smart-leds = "0.3.0"
 micromath = "2.0.0"
+
+[features]
+testing = ["groundhog/instant"]
+default = []
 
 [package.metadata.docs.rs]
 all-features = true
