@@ -1,0 +1,13 @@
+[package]
+name = "choreographer"
+version = "0.1.0"
+authors = ["James Munns <james.munns@ferrous-systems.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+groundhog = "0.1.0"
+heapless = "0.7.1"
+smart-leds = "0.3.0"
+micromath = "2.0.0"
