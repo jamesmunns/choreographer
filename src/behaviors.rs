@@ -1,9 +1,18 @@
-//! Behaviors
 //!
 //! Behaviors are the smallest unit of action that
 //! can be choreographed. They describe a pattern
 //! that is polled for some amount of time before
 //! moving to the next step.
+//!
+//! Note that all Behaviors are "color agnostic",
+//! in that they do not contain any information
+//! including color, duration, etc.
+//!
+//! This information is instead stored in the
+//! [`Context`] structure, and passed in on each
+//! poll event.
+//!
+//! [`Context`]: crate::engine::Context
 
 use crate::engine::Context;
 use crate::LossyIntoF32;
@@ -19,15 +28,11 @@ pub struct StayColor;
 
 impl StayColor {
     /// Create a new StayColor instance
-    ///
-    /// This instance contains no information, as color, duration,
-    /// and other information are stored in the
-    /// [`Context`](crate::engine::Context) structure
     pub fn new() -> Self {
         StayColor
     }
 
-    pub fn poll<R>(&self, context: &Context<R>) -> Option<RGB8>
+    pub(crate) fn poll<R>(&self, context: &Context<R>) -> Option<RGB8>
     where
         R: RollingTimer<Tick = u32> + Default + Clone,
     {
@@ -40,32 +45,24 @@ impl StayColor {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
-pub enum AutoIncr {
-    Never,
-    Once,
-    Forever,
-}
-
-impl Default for AutoIncr {
-    fn default() -> Self {
-        AutoIncr::Never
-    }
-}
-
+/// Cycler - A sine/cosine wave oscillator
+///
+/// A cycler can either "start low" as a sine wave, or
+/// "start high", as a cosine wave.
 #[derive(Clone)]
 pub struct Cycler {
     func: fn(f32) -> f32,
 }
 
 impl Cycler {
+    /// Create a new cycler starting low, using a sine function
     pub fn new() -> Self {
         Self {
             func: <f32 as F32Ext>::sin,
         }
     }
 
-    pub fn poll<R>(&self, context: &Context<R>) -> Option<RGB8>
+    pub(crate) fn poll<R>(&self, context: &Context<R>) -> Option<RGB8>
     where
         R: RollingTimer<Tick = u32> + Default + Clone,
     {
@@ -95,29 +92,31 @@ impl Cycler {
         Some(retval)
     }
 
+    /// Start the Cycler high, e.g. using a cosine function
     pub fn start_high(&mut self) {
         self.func = <f32 as F32Ext>::cos
     }
 
+    /// Start the Cycler low, e.g. using a sine function
     pub fn start_low(&mut self) {
         self.func = <f32 as F32Ext>::sin
     }
 }
 
+/// SeekColor - Linearly fade from the last color to a new color
+///
+/// This behavior linearly fades all r/g/b channels from the
+/// previous color to the new color
 #[derive(Clone)]
 pub struct SeekColor;
 
-// Methods:
-//
-// reinit(): reinitialize with the current time
-// poll() -> Option<RGB8>: Some if updated color, None if action is complete
-
 impl SeekColor {
+    /// Create a new SeekColor
     pub fn new() -> Self {
         Self
     }
 
-    pub fn poll<R>(&self, context: &Context<R>) -> Option<RGB8>
+    pub(crate) fn poll<R>(&self, context: &Context<R>) -> Option<RGB8>
     where
         R: RollingTimer<Tick = u32> + Default + Clone,
     {
@@ -144,12 +143,18 @@ impl SeekColor {
     }
 }
 
+/// FadeColor - Fade Up to a color or Fade down from a color to black
+///
+/// FadeColor is similar to a [`Cycler`](Cycler), but is intended for
+/// cases when you don't want a repeating sinusoid, but rather just
+/// want to "fade in" or "fade out" then hold a color.
 #[derive(Clone)]
 pub struct FadeColor {
-    pub cycler: Cycler,
+    cycler: Cycler,
 }
 
 impl FadeColor {
+    /// Create a new FadeColor, fading up to a color from black
     pub fn new_fade_up<R>(context: &mut Context<R>) -> Self
     where
         R: RollingTimer<Tick = u32> + Default + Clone,
@@ -165,6 +170,7 @@ impl FadeColor {
         Self { cycler }
     }
 
+    /// Create a new FadeColor, fading down from a color to black
     pub fn new_fade_down<R>(context: &mut Context<R>) -> Self
     where
         R: RollingTimer<Tick = u32> + Default + Clone,
@@ -180,14 +186,10 @@ impl FadeColor {
         Self { cycler }
     }
 
-    pub fn poll<R>(&self, context: &Context<R>) -> Option<RGB8>
+    pub(crate) fn poll<R>(&self, context: &Context<R>) -> Option<RGB8>
     where
         R: RollingTimer<Tick = u32> + Default + Clone,
     {
         self.cycler.poll(context)
-    }
-
-    pub fn inner_mut(&mut self) -> &mut Cycler {
-        &mut self.cycler
     }
 }

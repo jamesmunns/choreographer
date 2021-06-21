@@ -8,9 +8,9 @@
 //!
 //! ```rust
 //! # fn set_led(_: choreographer::RGB8) { }
-//!
+//! #
 //! use choreographer::{
-//!     engine::{Behavior, Sequence},
+//!     engine::{LoopBehavior, Sequence},
 //!     script,
 //! };
 //! use groundhog::std_timer::Timer;
@@ -34,7 +34,7 @@
 //!     |  solid |  BLACK |        1000 |         0.0 |               0 |   once |
 //!     |    sin |  WHITE |        2500 |      2500.0 |               0 |   once |
 //!     |  solid |  BLACK |        1000 |         0.0 |               0 |   once |
-//! }, Behavior::OneShot);
+//! }, LoopBehavior::OneShot);
 //!
 //! // Poll the script and update the LED until the
 //! // script has completed (4.5s or so)
@@ -53,11 +53,19 @@
 //! This project is licensed under the [Mozilla Public License v2.0](https://www.mozilla.org/en-US/MPL/2.0/).
 
 #![cfg_attr(not(test), no_std)]
-// #![deny(missing_docs)]
+#![deny(missing_docs)]
 
+/// Individual color behavior steps
 pub mod behaviors;
+
+/// The choreographer sequencing engine
 pub mod engine;
-pub use smart_leds::{colors, RGB8};
+
+/// The color types from the [`smart-leds`](https://docs.rs/smart-leds) crate
+pub use smart_leds::colors;
+
+/// The RGB8 type from the [`smart-leds`](https://docs.rs/smart-leds) crate
+pub use smart_leds::RGB8;
 
 /// A trait to convert integers into `f32`s
 ///
@@ -95,6 +103,10 @@ impl LossyIntoF32 for u8 {
     }
 }
 
+/// The `script!()` macro for defining [`Action`]s for a [`Sequence`]
+///
+/// [`Action`]: crate::engine::Action
+/// [`Sequence`]: crate::engine::Sequence
 #[macro_export]
 macro_rules! script {
     (| action | color | (duration_ms) | (period_ms_f) | (phase_offset_ms) | repeat | $(| $action:ident | $color:ident | ($duration_ms:expr) | ($period_ms_f:expr) | ($phase_offset_ms:expr) | $repeat:ident |)+) => {
@@ -144,7 +156,7 @@ macro_rules! script {
 #[cfg(test)]
 mod tests {
     use crate::{
-        engine::{Behavior, Sequence},
+        engine::{LoopBehavior, Sequence},
         script,
     };
     use groundhog::std_timer::Timer;
@@ -172,7 +184,7 @@ mod tests {
                 |    sin |  WHITE |        2500 |      2500.0 |               0 |   once |
                 |  solid |  BLACK |        1000 |         0.0 |               0 |   once |
             },
-            Behavior::OneShot,
+            LoopBehavior::OneShot,
         );
 
         // Poll the script and update the LED until the
