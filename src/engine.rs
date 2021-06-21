@@ -36,15 +36,15 @@
 //! [`LoopBehavior`]: crate::engine::LoopBehavior
 
 use core::cmp::min;
-use core::ops::{Deref, DerefMut};
 use core::marker::PhantomData;
+use core::ops::{Deref, DerefMut};
 
-use crate::behaviors::{Cycler, FadeColor, StayColor, SeekColor};
+use crate::behaviors::{Cycler, FadeColor, SeekColor, StayColor};
 use crate::LossyIntoF32;
 use groundhog::RollingTimer;
 use heapless::Vec;
-use smart_leds::RGB8;
 use smart_leds::colors::BLACK;
+use smart_leds::RGB8;
 
 /// A sequence of [`Action`]s with maximum length N.
 ///
@@ -57,8 +57,7 @@ use smart_leds::colors::BLACK;
 /// [`LoopBehavior`]: LoopBehavior)
 /// [`Sequence`]: Sequence
 #[derive(Clone)]
-pub struct Sequence<R, const N: usize>
-{
+pub struct Sequence<R, const N: usize> {
     seq: Vec<Action<R>, N>,
     position: usize,
     behavior: LoopBehavior,
@@ -235,12 +234,10 @@ where
 /// [`ActionBuilder`]: crate::engine::ActionBuilder
 /// [`LoopBehavior`]: crate::engine::LoopBehavior
 #[derive(Clone)]
-pub struct Action<R>
-{
+pub struct Action<R> {
     action: InnerAction<R>,
     behavior: LoopBehavior,
 }
-
 
 impl<R> Deref for Action<R>
 where
@@ -320,8 +317,7 @@ where
 ///
 /// [`Action`]: crate::engine::Action
 #[derive(Clone, Default)]
-pub struct Context<R>
-{
+pub struct Context<R> {
     pub(crate) start_tick: u32, // TODO: Hack - Not R::Tick because const init
     pub(crate) auto_incr_phase: AutoIncr,
     pub(crate) period_ms: f32,
@@ -366,7 +362,6 @@ struct InnerAction<R> {
     context: Context<R>,
     kind: InnerActionKind,
 }
-
 
 impl<R> Default for InnerAction<R>
 where
@@ -551,18 +546,10 @@ where
 
         // TODO: fix hax?
         self.act.action.context.period_ms = match self.act.action.kind {
-            InnerActionKind::Sin(_) => {
-                period_ms * 2.0
-            }
-            InnerActionKind::Static(_) => {
-                period_ms
-            }
-            InnerActionKind::Fade(_) => {
-                duration.lossy_into() * 4.0
-            }
-            InnerActionKind::Seek(_) => {
-                period_ms
-            }
+            InnerActionKind::Sin(_) => period_ms * 2.0,
+            InnerActionKind::Static(_) => period_ms,
+            InnerActionKind::Fade(_) => duration.lossy_into() * 4.0,
+            InnerActionKind::Seek(_) => period_ms,
         };
 
         self
