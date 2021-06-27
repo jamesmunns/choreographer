@@ -18,7 +18,7 @@
 //!
 //! A typical usage example would be to:
 //!
-//! 1. Create an array of [`Sequence`]s, one for each LED
+//! 1. Create an array of [`Sequence`]s, one for each LED (see the [`Sequence::new_array()`] method)
 //! 1. Use either the [`ActionBuilder`] or [`script!()`] macro
 //!     to define each [`Action`] in each [`Sequence`]
 //! 1. Periodically poll each [`Sequence`], using the resulting
@@ -28,6 +28,7 @@
 //!     a button press or received packet
 //!
 //! [`Sequence`]: crate::engine::Sequence
+//! [`Sequence::new_array()`]: crate::engine::Sequence::new_array
 //! [`Action`]: crate::engine::Action
 //! [`Context`]: crate::engine::Context
 //! [behavior]: crate::behaviors
@@ -80,7 +81,27 @@ impl<R, const N: usize> Sequence<R, N> {
     /// Create an array of new, empty sequences.
     ///
     /// This is often useful when creating an array for multiple
-    /// LEDs
+    /// LEDs. Alternatively, call [`Default::default()`] for the same effect.
+    ///
+    /// # Example
+    ///
+    /// Creating an array of [`Sequence`]s and setting each one to a script:
+    ///
+    /// ```rust
+    /// # use choreographer::{script, engine::{ActionBuilder, Sequence, LoopBehavior}};
+    /// # use groundhog::std_timer::Timer;
+    /// # type MicroTimer = Timer<1_000_000>;
+    /// let mut leds: [Sequence<MicroTimer, 8>; 16] = Sequence::new_array();
+    /// for led in leds.iter_mut() {
+    ///     led.set(&script!(
+    ///         | action |  color | duration_ms | period_ms_f | phase_offset_ms | repeat |
+    ///         |  solid |  BLACK |        1000 |         0.0 |               0 |   once |
+    ///         |    sin |  WHITE |        2500 |      2500.0 |               0 |   once |
+    ///         |  solid |  BLACK |        1000 |         0.0 |               0 |   once |
+    ///     ), LoopBehavior::OneShot);
+    ///
+    /// }
+    /// ```
     pub const fn new_array<const M: usize>() -> [Self; M] {
         [Self::INIT; M]
     }
@@ -233,6 +254,24 @@ where
 /// [`script!()`]: crate::script
 /// [`ActionBuilder`]: crate::engine::ActionBuilder
 /// [`LoopBehavior`]: crate::engine::LoopBehavior
+///
+/// # Example
+///
+/// Creating an array of [`Action`]s and setting each one to a different color:
+///
+/// ```rust
+/// # use choreographer::engine::{Action, ActionBuilder};
+/// use choreographer::colors::{RED, YELLOW, GREEN, CYAN, BLUE, MAGENTA};
+/// use groundhog::std_timer::Timer;
+/// type MicroTimer = Timer<1_000_000>;
+///
+/// let colors = [RED, YELLOW, GREEN, CYAN, BLUE, MAGENTA];
+/// let mut actions: [Action<MicroTimer>; 6] = Default::default();
+///
+/// for (action, color) in actions.iter_mut().zip(colors.iter()) {
+///     *action = ActionBuilder::new().once().seek().color(*color).for_ms(100).finish();
+/// }
+/// ```
 #[derive(Clone)]
 pub struct Action<R> {
     action: InnerAction<R>,
