@@ -239,6 +239,18 @@ pub struct Action<R> {
     behavior: LoopBehavior,
 }
 
+impl<R> Default for Action<R>
+where
+    R: RollingTimer<Tick = u32> + Default + Clone,
+{
+    fn default() -> Self {
+        Self {
+            action: Default::default(),
+            behavior: Default::default(),
+        }
+    }
+}
+
 impl<R> Deref for Action<R>
 where
     R: RollingTimer<Tick = u32> + Default + Clone,
