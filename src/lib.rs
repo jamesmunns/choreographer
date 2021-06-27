@@ -109,7 +109,7 @@ impl LossyIntoF32 for u8 {
 /// [`Sequence`]: crate::engine::Sequence
 #[macro_export]
 macro_rules! script {
-    (| action | color | (duration_ms) | (period_ms_f) | (phase_offset_ms) | repeat | $(| $action:ident | $color:ident | ($duration_ms:expr) | ($period_ms_f:expr) | ($phase_offset_ms:expr) | $repeat:ident |)+) => {
+    (| action | (color) | (duration_ms) | (period_ms_f) | (phase_offset_ms) | repeat | $(| $action:ident | ($color:expr) | ($duration_ms:expr) | ($period_ms_f:expr) | ($phase_offset_ms:expr) | $repeat:ident |)+) => {
         {
             #[allow(unused_imports)]
             use $crate::{
