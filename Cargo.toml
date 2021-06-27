@@ -1,6 +1,6 @@
 [package]
 name = "choreographer"
-version = "0.0.3"
+version = "0.0.4"
 description = "A color pattern sequencer, intended for groups of RGB LEDs"
 repository = "https://github.com/jamesmunns/choreographer"
 authors = ["James Munns <james.munns@ferrous-systems.com>"]
