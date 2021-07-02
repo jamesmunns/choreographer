@@ -108,4 +108,88 @@ fn smoke() {
     assert!(script.poll().is_none());
 }
 
+#[test]
+fn fade_up() {
+    timer_factory!();
 
+    TestTimer::set_ms(0);
+
+    // Create a script for a single LED with up to
+    // eight different steps in the sequence
+    let mut script: Sequence<TestTimer, 8> = Sequence::empty();
+
+    // This script will:
+    // * Keep the LED black for 1s
+    // * Fade from black to white and back in a sine pattern over 2.5s
+    // * Remain at black for 1s
+    // * End the sequence
+    script.set(&script! {
+        | action  |  color | duration_ms | period_ms_f | phase_offset_ms | repeat |
+        | fade_up |  WHITE |        1000 |         0.0 |               0 |   once |
+    }, LoopBehavior::OneShot);
+
+    let timer = TestTimer::new();
+
+    let mut last = script.poll().unwrap();
+    assert_eq!(last, colors::BLACK);
+
+    while timer.get_ticks() < 1000 {
+        let color = script.poll().unwrap();
+        assert!(color.r >= last.r);
+        assert!(color.g >= last.g);
+        assert!(color.b >= last.b);
+        last = color;
+
+        TestTimer::increment_ms(10);
+    }
+
+    assert_eq!(last, colors::WHITE);
+
+    assert_eq!(timer.get_ticks(), 1000);
+    assert!(script.poll().is_none());
+}
+
+#[test]
+fn fade_down() {
+    timer_factory!();
+
+    TestTimer::set_ms(0);
+
+    // Create a script for a single LED with up to
+    // eight different steps in the sequence
+    let mut script: Sequence<TestTimer, 8> = Sequence::empty();
+
+    // This script will:
+    // * Keep the LED black for 1s
+    // * Fade from black to white and back in a sine pattern over 2.5s
+    // * Remain at black for 1s
+    // * End the sequence
+    script.set(&script! {
+        | action    |  color | duration_ms | period_ms_f | phase_offset_ms | repeat |
+        | solid     |  WHITE |          10 |         0.0 |               0 |   once |
+        | fade_down |  WHITE |        1000 |         0.0 |               0 |   once |
+    }, LoopBehavior::OneShot);
+
+    let timer = TestTimer::new();
+
+    let mut last = script.poll().unwrap();
+    assert_eq!(last, colors::WHITE);
+    TestTimer::increment_ms(10);
+
+    while timer.get_ticks() < 1010 {
+        let color = script.poll().unwrap();
+        println!("last: {:?}, color: {:?}", last, color);
+        // assert!(color.r <= last.r);
+        // assert!(color.g <= last.g);
+        // assert!(color.b <= last.b);
+        last = color;
+
+        TestTimer::increment_ms(10);
+    }
+
+    assert_eq!(last, colors::BLACK);
+    assert_eq!(timer.get_ticks(), 1010);
+    assert!(script.poll().is_none());
+
+    panic!()
+}
